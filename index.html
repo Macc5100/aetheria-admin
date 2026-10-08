@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheria Chronicles - Admin Portal & Management System</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts: Cinzel & Kanit -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        fantasy: {
+                            950: '#07050e',
+                            900: '#0d091a',
+                            800: '#151028',
+                            700: '#21193c',
+                            600: '#322759',
+                            gold: '#dfb258',
+                            'gold-light': '#f5dc96',
+                            purple: '#8b5cf6',
+                            accent: '#38bdf8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #07050e;
+            color: #e2e8f0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d091a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #322759;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #dfb258;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #f5dc96 0%, #dfb258 50%, #b8860b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-panel {
+            background: rgba(21, 16, 40, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .glass-modal {
+            background: rgba(13, 9, 26, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(223, 178, 88, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-fantasy-950 text-slate-200 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+
+    <!-- Mobile Header Bar -->
+    <header class="md:hidden bg-fantasy-900 border-b border-fantasy-700 p-4 flex justify-between items-center sticky top-0 z-40">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-dragon text-fantasy-gold text-2xl"></i>
+            <span class="font-cinzel font-bold text-lg gold-gradient-text">AETHERIA</span>
+        </div>
+        <button id="mobileMenuBtn" class="text-slate-300 hover:text-fantasy-gold focus:outline-none">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-fantasy-900 border-r border-fantasy-700/60 z-30 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between">
+        <div>
+            <!-- Dashboard Brand -->
+            <div class="p-6 border-b border-fantasy-700/50 hidden md:flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-fantasy-gold to-fantasy-purple flex items-center justify-center text-fantasy-950 shadow-md">
+                    <i class="fa-solid fa-dragon text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-cinzel font-bold text-lg tracking-wider gold-gradient-text">AETHERIA</h1>
+                    <p class="text-xs text-purple-300 font-sans tracking-widest uppercase">Admin Portal</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5 font-medium">
+                <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">เมนูหลัก</p>
+                
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 bg-fantasy-600/60 text-fantasy-gold font-semibold shadow-sm">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>แดชบอร์ดสรุปผล</span>
+                </button>
+
+                <button onclick="switchTab('pixels')" id="nav-pixels" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-400 hover:bg-fantasy-800 hover:text-slate-100">
+                    <i class="fa-solid fa-code w-5 text-center"></i>
+                    <span>ตั้งค่า Pixel & Tracking</span>
+                </button>
+
+                <button onclick="switchTab('articles')" id="nav-articles" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-400 hover:bg-fantasy-800 hover:text-slate-100">
+                    <i class="fa-solid fa-newspaper w-5 text-center"></i>
+                    <span>จัดการบทความ / ข่าว</span>
+                </button>
+
+                <button onclick="switchTab('announcements')" id="nav-announcements" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-400 hover:bg-fantasy-800 hover:text-slate-100">
+                    <i class="fa-solid fa-bullhorn w-5 text-center"></i>
+                    <span>ปรับเปลี่ยนป้ายประกาศ</span>
+                </button>
+
+                <button onclick="switchTab('preview')" id="nav-preview" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-400 hover:bg-fantasy-800 hover:text-slate-100">
+                    <i class="fa-solid fa-laptop-code w-5 text-center"></i>
+                    <span>พรีวิวเว็บไซต์จริง</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- System Controls -->
+        <div class="p-4 border-t border-fantasy-700/50 bg-fantasy-950/50 space-y-2">
+            <a href="https://aetheria-chronicles-cpa.pages.dev/" target="_blank" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-fantasy-800 border border-fantasy-700 text-xs text-purple-200 hover:text-white transition">
+                <i class="fa-solid fa-external-link text-xs"></i>
+                <span>ไปยังเว็บหลัก</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile menu -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/60 z-20 hidden md:hidden"></div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+
+        <!-- Header Status Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-fantasy-700/60">
+            <div>
+                <h2 id="pageTitle" class="text-2xl font-bold text-white tracking-wide font-cinzel">แดชบอร์ดสรุปผล (Overview)</h2>
+                <p id="pageDescription" class="text-sm text-slate-400 mt-1">จัดการระบบหลังบ้าน ข่าวสาร Pixel Tracking และประกาศของ Aetheria Chronicles</p>
+            </div>
+            <div class="flex items-center gap-3 self-start sm:self-auto">
+                <button onclick="resetDataToDefault()" class="text-xs px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-left"></i> รีเซ็ตตัวอย่าง
+                </button>
+                <div class="bg-fantasy-900 px-3 py-1.5 rounded-lg border border-fantasy-700 text-xs text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-clock text-fantasy-gold"></i>
+                    <span id="currentTimeDisplay">--:--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications Container -->
+        <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+        <!-- SECTION 1: DASHBOARD OVERVIEW -->
+        <section id="section-dashboard" class="tab-section space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-fantasy-gold flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">บทความทั้งหมด</p>
+                        <h3 id="statTotalArticles" class="text-3xl font-bold text-white mt-1">0</h3>
+                        <p class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-check me-1"></i>พร้อมเผยแพร่</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-fantasy-gold/10 text-fantasy-gold flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-newspaper"></i>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-purple-500 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">สถานะป้ายประกาศ</p>
+                        <h3 id="statBannerStatus" class="text-lg font-bold text-white mt-1">เปิดใช้งาน</h3>
+                        <p id="statBannerText" class="text-xs text-slate-400 mt-1 truncate max-w-[150px]">-</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-blue-500 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Pixel ที่เปิดใช้งาน</p>
+                        <h3 id="statActivePixels" class="text-3xl font-bold text-white mt-1">0</h3>
+                        <p class="text-xs text-blue-400 mt-1"><i class="fa-solid fa-chart-line me-1"></i>กำลังเก็บข้อมูล</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-emerald-500 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">เข้าชมรวม (ประมาณ)</p>
+                        <h3 class="text-3xl font-bold text-white mt-1">18,520</h3>
+                        <p class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-arrow-up me-1"></i>+15.2% สัปดาห์นี้</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Articles List -->
+                <div class="lg:col-span-2 glass-panel p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-white font-cinzel flex items-center gap-2">
+                            <i class="fa-solid fa-newspaper text-fantasy-gold"></i> บทความล่าสุด
+                        </h3>
+                        <button onclick="switchTab('articles')" class="text-xs text-fantasy-gold hover:underline">ดูทั้งหมด <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="text-xs uppercase bg-fantasy-900 text-slate-400 border-b border-fantasy-700/50">
+                                <tr>
+                                    <th class="py-3 px-4">หัวข้อบทความ</th>
+                                    <th class="py-3 px-4">หมวดหมู่</th>
+                                    <th class="py-3 px-4">สถานะ</th>
+                                    <th class="py-3 px-4">วันที่</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashRecentArticles" class="divide-y divide-fantasy-700/40">
+                                <!-- Dynamic JS content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pixel Quick Status -->
+                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg text-white font-cinzel mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-fantasy-purple"></i> สถานะ Tracking Pixel
+                        </h3>
+                        <div id="dashPixelStatusList" class="space-y-3">
+                            <!-- Dynamic JS content -->
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-fantasy-700/50">
+                        <button onclick="switchTab('pixels')" class="w-full py-2.5 px-4 rounded-xl bg-fantasy-800 hover:bg-fantasy-700 text-xs text-center font-medium text-slate-200 transition">
+                            <i class="fa-solid fa-gear me-1"></i> ตั้งค่า Pixel ทั้งหมด
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: PIXELS & TRACKING SCRIPT MANAGER -->
+        <section id="section-pixels" class="tab-section hidden space-y-6">
+            <form id="pixelSettingsForm" onsubmit="savePixelSettings(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Meta / Facebook Pixel -->
+                    <div class="glass-panel p-6 rounded-2xl border border-fantasy-700/50 space-y-4">
+                        <div class="flex items-center justify-between border-b border-fantasy-700/50 pb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center text-xl">
+                                    <i class="fa-brands fa-facebook-f"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white">Meta / Facebook Pixel</h3>
+                                    <p class="text-xs text-slate-400">ติดตาม Conversion & Events</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="fbPixelActive" class="sr-only peer">
+                                <div class="w-11 h-6 bg-fantasy-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-fantasy-purple"></div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2">Meta Pixel ID</label>
+                            <input type="text" id="fbPixelId" placeholder="เช่น 123456789012345" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-fantasy-gold transition">
+                        </div>
+                    </div>
+
+                    <!-- Google Analytics -->
+                    <div class="glass-panel p-6 rounded-2xl border border-fantasy-700/50 space-y-4">
+                        <div class="flex items-center justify-between border-b border-fantasy-700/50 pb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                                    <i class="fa-brands fa-google"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white">Google Analytics / GTM</h3>
+                                    <p class="text-xs text-slate-400">GA4 ID หรือ Tag Manager ID</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="gaActive" class="sr-only peer">
+                                <div class="w-11 h-6 bg-fantasy-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-fantasy-purple"></div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2">Measurement ID / Container ID</label>
+                            <input type="text" id="gaId" placeholder="เช่น G-XXXXXXXXXX หรือ GTM-XXXXXX" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-fantasy-gold transition">
+                        </div>
+                    </div>
+
+                    <!-- TikTok Pixel -->
+                    <div class="glass-panel p-6 rounded-2xl border border-fantasy-700/50 space-y-4">
+                        <div class="flex items-center justify-between border-b border-fantasy-700/50 pb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center text-xl">
+                                    <i class="fa-brands fa-tiktok"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white">TikTok Pixel</h3>
+                                    <p class="text-xs text-slate-400">วัดผลแคมเปญโฆษณา TikTok</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="ttPixelActive" class="sr-only peer">
+                                <div class="w-11 h-6 bg-fantasy-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-fantasy-purple"></div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2">TikTok Pixel ID</label>
+                            <input type="text" id="ttPixelId" placeholder="เช่น CXXXXXXXXXXXXXXXXX" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-fantasy-gold transition">
+                        </div>
+                    </div>
+
+                    <!-- Custom Scripts -->
+                    <div class="glass-panel p-6 rounded-2xl border border-fantasy-700/50 space-y-4 md:col-span-2">
+                        <div class="flex items-center gap-3 border-b border-fantasy-700/50 pb-3">
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white">Custom Header Scripts (&lt;head&gt;)</h3>
+                                <p class="text-xs text-slate-400">โค้ด HTML/JS พิเศษจะถูกแทรกลงในเว็บไซต์</p>
+                            </div>
+                        </div>
+                        <textarea id="customHeaderScript" rows="4" placeholder="<!-- ใส่โค้ด Script เพิ่มเติมตรงนี้ -->" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl p-4 text-xs font-mono text-emerald-300 focus:outline-none focus:border-fantasy-gold transition"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-fantasy-gold to-amber-600 text-fantasy-950 font-bold hover:brightness-110 shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> บันทึกการตั้งค่า Pixel
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- SECTION 3: ARTICLE MANAGEMENT -->
+        <section id="section-articles" class="tab-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+                <div class="flex items-center gap-2 flex-1 max-w-md">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="articleSearchInput" oninput="renderArticlesTable()" placeholder="ค้นหาบทความ..." class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-fantasy-gold">
+                    </div>
+                    <select id="articleCategoryFilter" onchange="renderArticlesTable()" class="bg-fantasy-900 border border-fantasy-700 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-fantasy-gold">
+                        <option value="ALL">ทุกหมวดหมู่</option>
+                        <option value="อัปเดตเกม">อัปเดตเกม</option>
+                        <option value="กิจกรรม">กิจกรรม</option>
+                        <option value="ไกด์การเล่น">ไกด์การเล่น</option>
+                        <option value="ประกาศสโมสร">ประกาศสโมสร</option>
+                    </select>
+                </div>
+                <button onclick="openArticleModal()" class="px-5 py-2.5 rounded-xl bg-fantasy-purple hover:bg-purple-600 text-white font-medium text-sm transition shadow-lg shadow-purple-900/40 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i> เพิ่มบทความใหม่
+                </button>
+            </div>
+
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-xs uppercase bg-fantasy-900 text-slate-400 border-b border-fantasy-700/50">
+                            <tr>
+                                <th class="py-3.5 px-4">ภาพปก</th>
+                                <th class="py-3.5 px-4">ชื่อบทความ</th>
+                                <th class="py-3.5 px-4">หมวดหมู่</th>
+                                <th class="py-3.5 px-4">สถานะ</th>
+                                <th class="py-3.5 px-4">วันที่สร้าง</th>
+                                <th class="py-3.5 px-4 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="articlesTableBody" class="divide-y divide-fantasy-700/40">
+                            <!-- Dynamic Table Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ANNOUNCEMENTS & BANNER EDITOR -->
+        <section id="section-announcements" class="tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Announcement Form -->
+                <div class="glass-panel p-6 rounded-2xl border border-fantasy-700/50 space-y-5">
+                    <h3 class="font-bold text-lg text-white font-cinzel border-b border-fantasy-700/60 pb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-fantasy-gold"></i> ปรับแต่งป้ายประกาศ (Banner Alert)
+                    </h3>
+                    
+                    <form id="announcementForm" onsubmit="saveAnnouncement(event)" class="space-y-4">
+                        <div class="flex items-center justify-between bg-fantasy-900 p-4 rounded-xl border border-fantasy-700/50">
+                            <div>
+                                <span class="font-semibold text-sm text-white">แสดงป้ายประกาศ</span>
+                                <p class="text-xs text-slate-400">เปิด-ปิด การมองเห็นบนหน้าเว็บหลัก</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="announcementActive" onchange="updateLiveBannerPreview()" class="sr-only peer">
+                                <div class="w-11 h-6 bg-fantasy-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-fantasy-gold"></div>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">ข้อความประกาศ</label>
+                            <input type="text" id="announcementText" oninput="updateLiveBannerPreview()" required placeholder="เช่น 🎉 เปิดลงทะเบียนรับสิทธิ์ทดสอบแล้ววันนี้!" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-fantasy-gold">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">ลิงก์ปลายทาง (URL)</label>
+                            <input type="text" id="announcementLink" oninput="updateLiveBannerPreview()" placeholder="https://aetheria-chronicles-cpa.pages.dev/" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-fantasy-gold">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">สีพื้นหลัง</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="announcementBgColor" oninput="updateLiveBannerPreview()" value="#8b5cf6" class="w-10 h-10 rounded-lg border-0 bg-transparent cursor-pointer">
+                                    <input type="text" id="announcementBgColorText" oninput="syncColorInput('bg')" value="#8b5cf6" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-3 py-2 text-xs text-white font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">สีข้อความ</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="announcementTextColor" oninput="updateLiveBannerPreview()" value="#ffffff" class="w-10 h-10 rounded-lg border-0 bg-transparent cursor-pointer">
+                                    <input type="text" id="announcementTextColorText" oninput="syncColorInput('text')" value="#ffffff" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-3 py-2 text-xs text-white font-mono">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 rounded-xl bg-fantasy-gold text-fantasy-950 font-bold hover:brightness-110 shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> บันทึกการเปลี่ยนแปลงป้ายประกาศ
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Live Banner Preview Panel -->
+                <div class="glass-panel p-6 rounded-2xl border border-fantasy-700/50 flex flex-col">
+                    <h3 class="font-bold text-lg text-white font-cinzel border-b border-fantasy-700/60 pb-3 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-eye text-fantasy-purple"></i> ตัวอย่างแสดงผลจริง (Live Preview)
+                    </h3>
+                    
+                    <div class="flex-1 bg-fantasy-950 rounded-xl border border-fantasy-700 p-4 flex flex-col justify-between overflow-hidden relative min-h-[300px]">
+                        <div class="flex items-center gap-2 pb-3 border-b border-fantasy-800 text-xs text-slate-500">
+                            <div class="flex gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+                            </div>
+                            <span class="bg-fantasy-900 px-3 py-1 rounded-md w-full text-center text-slate-400 text-[10px] font-mono">aetheria-chronicles-cpa.pages.dev</span>
+                        </div>
+
+                        <div id="liveBannerPreview" class="my-2 p-3 text-center text-xs sm:text-sm font-medium transition-all shadow-md flex items-center justify-between gap-2 rounded-lg">
+                            <span id="previewBannerText" class="truncate flex-1">ข้อความประกาศ</span>
+                            <a id="previewBannerLinkBtn" href="#" target="_blank" class="px-3 py-1 rounded bg-black/20 hover:bg-black/30 text-xs font-semibold whitespace-nowrap">ดูรายละเอียด</a>
+                        </div>
+
+                        <div class="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-3 opacity-30">
+                            <i class="fa-solid fa-dragon text-4xl text-fantasy-gold"></i>
+                            <h4 class="font-cinzel text-lg font-bold text-slate-300">AETHERIA CHRONICLES</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: LIVE SITE PREVIEW -->
+        <section id="section-preview" class="tab-section hidden space-y-4">
+            <div class="glass-panel p-4 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                    <span class="text-sm font-medium text-slate-300">หน้าเว็บหลัก: <a href="https://aetheria-chronicles-cpa.pages.dev/" target="_blank" class="text-fantasy-gold hover:underline">https://aetheria-chronicles-cpa.pages.dev/</a></span>
+                </div>
+                <button onclick="reloadPreviewIframe()" class="px-3 py-1.5 rounded-lg bg-fantasy-800 text-xs text-slate-200 hover:bg-fantasy-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrows-rotate"></i> โหลดใหม่
+                </button>
+            </div>
+            <div class="glass-panel rounded-2xl overflow-hidden border border-fantasy-700/50 h-[650px] relative">
+                <iframe id="sitePreviewIframe" src="https://aetheria-chronicles-cpa.pages.dev/" class="w-full h-full border-0"></iframe>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ARTICLE MODAL (Create / Edit) -->
+    <div id="articleModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-modal rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-fantasy-700 pb-3">
+                <h3 id="modalArticleTitle" class="text-lg font-bold text-white font-cinzel">สร้างบทความใหม่</h3>
+                <button onclick="closeArticleModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <form id="articleForm" onsubmit="saveArticle(event)" class="space-y-4">
+                <input type="hidden" id="articleId">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">หัวข้อบทความ *</label>
+                    <input type="text" id="articleTitle" required placeholder="เช่น อัปเดตแพตช์ 2.5 เปิดดันเจี้ยนใหม่" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-fantasy-gold">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">หมวดหมู่</label>
+                        <select id="articleCategory" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-fantasy-gold">
+                            <option value="อัปเดตเกม">อัปเดตเกม</option>
+                            <option value="กิจกรรม">กิจกรรม</option>
+                            <option value="ไกด์การเล่น">ไกด์การเล่น</option>
+                            <option value="ประกาศสโมสร">ประกาศสโมสร</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">สถานะ</label>
+                        <select id="articleStatus" class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-fantasy-gold">
+                            <option value="เผยแพร่แล้ว">เผยแพร่แล้ว (Published)</option>
+                            <option value="ฉบับร่าง">ฉบับร่าง (Draft)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">URL ภาพปก (Featured Image)</label>
+                    <input type="text" id="articleImageUrl" placeholder="https://images.unsplash.com/..." class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-fantasy-gold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">เรื่องย่อ (Excerpt)</label>
+                    <textarea id="articleExcerpt" rows="2" placeholder="สรุปเนื้อหาสำคัญสั้นๆ..." class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-fantasy-gold"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">เนื้อหาบทความ (Rich Content)</label>
+                    <textarea id="articleContent" rows="6" required placeholder="รายละเอียดเนื้อหาที่นี่..." class="w-full bg-fantasy-900 border border-fantasy-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-fantasy-gold"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeArticleModal()" class="px-4 py-2.5 rounded-xl bg-fantasy-800 text-slate-300 text-sm hover:bg-fantasy-700 transition">ยกเลิก</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-fantasy-gold text-fantasy-950 font-bold text-sm hover:brightness-110 shadow-lg shadow-amber-500/20 transition">บันทึกบทความ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ================= CONFIGURATION & CONSTANTS =================
+        // Default Sample Data
+        const DEFAULT_ARTICLES = [
+            {
+                id: "art-1",
+                title: "อัปเดตแพตช์ 2.5: การหวนคืนของมังกรโบราณ Aether",
+                category: "อัปเดตเกม",
+                status: "เผยแพร่แล้ว",
+                excerpt: "สัมผัสประสบการณ์ดันเจี้ยนใหม่ พร้อมกับระบบการเปลี่ยนอาชีพขั้นสูง",
+                content: "รายละเอียดการอัปเดตแพตช์ประจำเดือน รวมถึงการปรับสมดุลอาชีพ จอมเวท และ นครนักรบ...",
+                imageUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80",
+                createdAt: "2026-10-01"
+            },
+            {
+                id: "art-2",
+                title: "กิจกรรมแจกโค้ดต้อนรับผู้เล่นใหม่ รับทันที 1,000 เพชร!",
+                category: "กิจกรรม",
+                status: "เผยแพร่แล้ว",
+                excerpt: "ลงทะเบียนสัปดาห์นี้รับไอเทมสนับสนุนเริ่มต้นฟรี พร้อมตั๋วสุ่มกาชา",
+                content: "เงื่อนไขการรับรางวัล เพียงเข้าสู่ระบบต่อเนื่องครบ 7 วัน รับสิทธิ์หมุนวงล้อนำโชค...",
+                imageUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=600&q=80",
+                createdAt: "2026-10-05"
+            }
+        ];
+
+        const DEFAULT_PIXELS = {
+            fbPixelActive: true,
+            fbPixelId: "987654321098765",
+            gaActive: true,
+            gaId: "G-AETHERIA2026",
+            ttPixelActive: false,
+            ttPixelId: "",
+            customHeaderScript: "<!-- Global site tag (gtag.js) - Google Analytics -->"
+        };
+
+        const DEFAULT_ANNOUNCEMENT = {
+            active: true,
+            text: "🔥 เปิดลงทะเบียนล่วงหน้า Aetheria Chronicles รับไอเทม SSR ฟรี!",
+            link: "https://aetheria-chronicles-cpa.pages.dev/",
+            bgColor: "#8b5cf6",
+            textColor: "#ffffff"
+        };
+
+        // Storage Helpers
+        function getStorage(key, defaultValue) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : defaultValue;
+        }
+
+        function setStorage(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        // Global Application State
+        let appArticles = getStorage('aetheria_articles', DEFAULT_ARTICLES);
+        let appPixels = getStorage('aetheria_pixels', DEFAULT_PIXELS);
+        let appAnnouncement = getStorage('aetheria_announcement', DEFAULT_ANNOUNCEMENT);
+
+        // ================= UI NAVIGATION =================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-fantasy-600/60', 'text-fantasy-gold', 'font-semibold', 'shadow-sm');
+                btn.classList.add('text-slate-400');
+            });
+
+            const targetSection = document.getElementById(`section-${tabId}`);
+            if (targetSection) targetSection.classList.remove('hidden');
+
+            const targetBtn = document.getElementById(`nav-${tabId}`);
+            if (targetBtn) {
+                targetBtn.classList.add('bg-fantasy-600/60', 'text-fantasy-gold', 'font-semibold', 'shadow-sm');
+                targetBtn.classList.remove('text-slate-400');
+            }
+
+            const titleMap = {
+                'dashboard': ['แดชบอร์ดสรุปผล (Overview)', 'จัดการระบบหลังบ้าน ข่าวสาร Pixel Tracking และประกาศของ Aetheria Chronicles'],
+                'pixels': ['ตั้งค่า Pixel & Tracking Scripts', 'จัดการ Meta Pixel, Google Analytics, TikTok Pixel และ Custom Scripts'],
+                'articles': ['จัดการบทความ และข่าวสาร (Articles)', 'เพิ่ม แก้ไข ลบ และจัดการสถานะการเผยแพร่ข่าวสาร'],
+                'announcements': ['ปรับแต่งป้ายประกาศ (Announcement Banner)', 'แก้ไขข้อความ สี และการแสดงผลป้ายแจ้งเตือนหน้าเว็บ'],
+                'preview': ['พรีวิวหน้าเว็บไซต์จริง (Site Preview)', 'ดูการแสดงผลแบบเรียลไทม์บนโดเมนหลัก']
+            };
+
+            if (titleMap[tabId]) {
+                document.getElementById('pageTitle').textContent = titleMap[tabId][0];
+                document.getElementById('pageDescription').textContent = titleMap[tabId][1];
+            }
+
+            closeMobileMenu();
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-amber-400';
+            toast.className = `glass-panel px-4 py-3 rounded-xl text-sm font-medium text-white shadow-xl flex items-center gap-2 border-l-4 ${type === 'success' ? 'border-l-emerald-500' : 'border-l-amber-500'} transition-all duration-300 transform translate-y-2 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+
+            const container = document.getElementById('toastContainer');
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTimeDisplay').textContent = now.toLocaleTimeString('th-TH');
+        }
+
+        function renderDashboard() {
+            document.getElementById('statTotalArticles').textContent = appArticles.length;
+            document.getElementById('statBannerStatus').textContent = appAnnouncement.active ? 'เปิดใช้งาน' : '
